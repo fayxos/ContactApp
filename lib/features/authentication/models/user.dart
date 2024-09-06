@@ -8,14 +8,14 @@ class User {
   String? firstname;
   String? lastname;
   String? email;
-  bool? isEmailVerified;
+  bool? emailVerified;
 
   User({
     this.id,
     this.firstname,
     this.lastname,
     this.email,
-    this.isEmailVerified
+    this.emailVerified
   });
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);

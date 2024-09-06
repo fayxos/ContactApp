@@ -1,4 +1,5 @@
 import 'package:contact_app/features/authentication/controllers/auth_controller.dart';
+import 'package:contact_app/features/connections/views/home_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -25,7 +26,10 @@ class VerifyEmailView extends StatelessWidget {
       /// Reason: We will store the data when user enters the Register Button on Previous screen.
       /// Whenever the user opens the app, we will check if email is verified or not.
       /// If not verified we will always show this Verification screen.
-      appBar: CustomAppBar(actions: [IconButton(onPressed: () => Get.offAll(LoginView(authController: authController,)), icon: const Icon(CupertinoIcons.clear))]),
+      appBar: CustomAppBar(actions: [IconButton(onPressed: () {
+        authController.logout();
+        Get.offAll(() => LoginView(authController: authController,));
+    }, icon: const Icon(CupertinoIcons.clear))]),
       body: SingleChildScrollView(
         // Padding to Give Default Equal Space on all sides in all screens.
         child: Padding(
@@ -42,7 +46,7 @@ class VerifyEmailView extends StatelessWidget {
               /// Title & SubTitle
               Text(Texts.confirmEmail, style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.center),
               const SizedBox(height: Sizes.spaceBtwItems),
-              Text('support@codingwitht.com', style: Theme.of(context).textTheme.labelLarge, textAlign: TextAlign.center),
+              Text(authController.currentUser.email!, style: Theme.of(context).textTheme.labelLarge, textAlign: TextAlign.center),
               const SizedBox(height: Sizes.spaceBtwItems),
               Text(Texts.confirmEmailSubTitle, style: Theme.of(context).textTheme.labelMedium, textAlign: TextAlign.center),
               const SizedBox(height: Sizes.spaceBtwSections),
@@ -57,7 +61,7 @@ class VerifyEmailView extends StatelessWidget {
                             image: ImageStrings.staticSuccessIllustration,
                             title: Texts.yourAccountCreatedTitle,
                             subTitle: Texts.yourAccountCreatedSubTitle,
-                            onPressed: () { authController.onEmailVerificationChange(true); }),
+                            onPressed: () { Get.offAll(() => const HomeView()); }),
                           );
                       } else {
                         const snackbar = SnackBar(

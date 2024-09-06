@@ -1,12 +1,16 @@
-import 'dart:ui';
 
 import 'package:contact_app/features/authentication/models/user.dart';
+import 'package:contact_app/features/authentication/views/verify_email.dart';
+import 'package:contact_app/features/connections/views/home_view.dart';
 import 'package:contact_app/utils/http/http_client.dart';
-import 'package:contact_app/utils/logging/logger.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+
+
+import '../../../utils/logging/logger.dart';
+import '../views/login.dart';
 
 class AuthController {
   final storage = const FlutterSecureStorage();
@@ -15,11 +19,20 @@ class AuthController {
   bool? isAuthenticated;
   bool? isEmailVerified;
 
-  Function(bool?) onAuthenticationChange;
-  Function(bool?) onEmailVerificationChange;
-
-  AuthController(this.onAuthenticationChange, this.onEmailVerificationChange) {
+  AuthController() {
     checkAuthentication();
+  }
+
+  void goToView() {
+    if(isAuthenticated == null) return;
+
+    if(!isAuthenticated!) {
+      Get.offAll(() => LoginView(authController: this));
+    } else if(isEmailVerified == null || !isEmailVerified!) {
+      Get.offAll(() => VerifyEmailView(authController: this));
+    } else {
+      Get.offAll(() => const HomeView());
+    }
   }
 
   void checkAuthentication() async {
@@ -28,7 +41,6 @@ class AuthController {
     // Not Logged in
     if(jwtToken == null) {
       isAuthenticated = false;
-      onAuthenticationChange(isAuthenticated);
       return;
     }
 
@@ -37,7 +49,6 @@ class AuthController {
       String? refreshToken = await getRefreshToken();
       if(refreshToken == null) {
         isAuthenticated = false;
-        onAuthenticationChange(isAuthenticated);
         return;
       }
 
@@ -45,7 +56,6 @@ class AuthController {
       // refreshToken expired
       if(newJwtToken == null) {
         isAuthenticated = false;
-        onAuthenticationChange(isAuthenticated);
         return;
       }
 
@@ -55,17 +65,13 @@ class AuthController {
     User? user = await getAuthenticatedUser(jwtToken);
     if(user == null) {
       isAuthenticated = false;
-      onAuthenticationChange(isAuthenticated);
       return;
     }
 
     currentUser = user;
 
-    isEmailVerified = user.isEmailVerified;
-    onEmailVerificationChange(isEmailVerified);
-
+    isEmailVerified = user.emailVerified;
     isAuthenticated = true;
-    onAuthenticationChange(isAuthenticated);
   }
 
   Future<String?> refreshJwtToken(String refreshToken) async {
@@ -113,11 +119,14 @@ class AuthController {
       Map<String, dynamic> userData = data['userDetails'];
       currentUser = User.fromJson(userData);
 
-      isEmailVerified = currentUser.isEmailVerified;
-      onEmailVerificationChange(isEmailVerified);
-
       isAuthenticated = true;
-      onAuthenticationChange(isAuthenticated);
+      isEmailVerified = currentUser.emailVerified;
+      if(isEmailVerified == null || !isEmailVerified!) {
+        Get.offAll(() => VerifyEmailView(authController: this,));
+        return true;
+      }
+
+      Get.offAll(() => const HomeView());
 
       return true;
     } on Exception catch (_) {
@@ -144,17 +153,32 @@ class AuthController {
       Map<String, dynamic> userData = data['userDetails'];
       currentUser = User.fromJson(userData);
 
-      isEmailVerified = false;
-      onEmailVerificationChange(isEmailVerified);
-
       isAuthenticated = true;
-      onAuthenticationChange(isAuthenticated);
-
+      isEmailVerified = false;
+      Get.offAll(() => VerifyEmailView(authController: this,));
       return true;
     } on Exception catch (_) {
       return false;
     }
 
+  }
+
+  Future<void> logout() async {
+    try {
+      int userId = currentUser.id!;
+      String jwtToken = (await getJwtToken())!;
+
+      Map<String, dynamic> data = await HttpHelper.post(
+          "users/$userId/logout",
+          {},
+          jwtToken);
+    } on Exception catch (_) { }
+
+    clearTokens();
+    isAuthenticated = false;
+    isEmailVerified = false;
+
+    Get.offAll(() => LoginView(authController: this,));
   }
 
   Future<void> storeJwtToken(String token) async {

@@ -19,25 +19,11 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   late AuthController authController;
-  bool? isAuthenticated;
-  bool? isEmailVerified;
-
-  void _setAuthentication(bool? authenticated) {
-    setState(() {
-      isAuthenticated = authenticated;
-    });
-  }
-
-  void _setEmailVerified(bool? verified) {
-    setState(() {
-      isEmailVerified = verified;
-    });
-  }
 
   @override
   void initState() {
     super.initState();
-    authController = AuthController(_setAuthentication, _setEmailVerified);
+    authController = AuthController();
   }
 
   // This widget is the root of your application.
@@ -47,22 +33,9 @@ class _MyAppState extends State<MyApp> {
       title: Texts.appName,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      home: _getHomeView(isAuthenticated, isEmailVerified),
+      home: LoadingView(authController: authController,),
       debugShowCheckedModeBanner: false,
     );
   }
 
-  Widget _getHomeView(bool? isAuthenticated, bool? isEmailVerified) {
-    return LoginView(authController: authController);
-
-    if (isAuthenticated == null || isEmailVerified == null) {
-      return const LoadingView();
-    } else if (isAuthenticated && isEmailVerified) {
-      return HomeView();
-    } else if(isAuthenticated && !isEmailVerified) {
-      return VerifyEmailView(authController: authController);
-    } else {
-      return LoginView(authController: authController);
-    }
-  }
 }
