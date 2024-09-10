@@ -27,12 +27,12 @@ class SearchContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     final dark = HelperFunctions.isDarkMode(context);
     return GestureDetector(
-      onTap: () {},
+      onTap: onTap,
       child: Padding(
         padding: padding,
         child: Container(
           width: DeviceUtils.getScreenWidth(context),
-          padding: const EdgeInsets.all(Sizes.md),
+          padding: const EdgeInsets.all(13),
           decoration: BoxDecoration(
             color: showBackground
                 ? dark
@@ -40,7 +40,7 @@ class SearchContainer extends StatelessWidget {
                     : CustomColors.light
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(Sizes.cardRadiusLg),
-            border: showBorder ? Border.all(color: CustomColors.grey) : null,
+            border: showBorder ? Border.all(color: HelperFunctions.isDarkMode(context) ? CustomColors.darkerGrey : CustomColors.grey) : null,
           ),
           child: Row(
             children: [

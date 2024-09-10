@@ -23,7 +23,12 @@ class ConnectionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading: CircularImage(padding: 0, image: imageUrl ?? "assets/content/user.png", width: 40, height: 40, fit: BoxFit.cover, isNetworkImage: imageUrl != null && jwtToken == null, jwtToken: imageUrl == null ? null : jwtToken,),
-      title: Text("${user.firstname} ${user.lastname}", style: Theme.of(context).textTheme.headlineSmall!),
+      title: Row(
+        children: [
+          Text("${user.firstname} ", style: Theme.of(context).textTheme.headlineSmall!.apply(fontWeightDelta: -2)),
+          Text("${user.lastname}", style: Theme.of(context).textTheme.headlineSmall!),
+        ],
+      ),
       trailing: trailingWidget,
     );
   }

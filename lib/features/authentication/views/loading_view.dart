@@ -33,7 +33,7 @@ class _LoadingViewState extends State<LoadingView> {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      body: Text("loading"),
+      body: SizedBox(),
     );
   }
 }

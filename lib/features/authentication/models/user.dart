@@ -18,6 +18,10 @@ class User {
     this.emailVerified
   });
 
+  String getFullName() {
+    return "${firstname!} $lastname";
+  }
+
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
   Map<String, dynamic> toJson() => _$UserToJson(this);
 }
