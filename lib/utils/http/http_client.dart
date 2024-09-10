@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:contact_app/utils/logging/logger.dart';
 import 'package:http/http.dart' as http;
 
 class HttpHelper {

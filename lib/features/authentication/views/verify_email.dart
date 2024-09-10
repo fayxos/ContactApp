@@ -55,13 +55,14 @@ class VerifyEmailView extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                    onPressed: () {
-                      if(authController.isEmailVerified != null && authController.isEmailVerified!) {
+                    onPressed: () async {
+                      bool isEmailVerified = await authController.getEmailVerified();
+                      if(isEmailVerified) {
                         Get.to(() => SuccessView(
                             image: ImageStrings.staticSuccessIllustration,
                             title: Texts.yourAccountCreatedTitle,
                             subTitle: Texts.yourAccountCreatedSubTitle,
-                            onPressed: () { Get.offAll(() => const HomeView()); }),
+                            onPressed: () { Get.offAll(() => HomeView(authController: authController,)); }),
                           );
                       } else {
                         const snackbar = SnackBar(

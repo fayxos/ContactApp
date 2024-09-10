@@ -49,6 +49,11 @@ dependencies:
   iconsax:
   cupertino_icons: ^1.0.8
 
+  web_socket_channel:
+
+  flutter_svg:
+  cached_network_image:
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

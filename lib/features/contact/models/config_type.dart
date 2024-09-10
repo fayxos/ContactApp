@@ -1,6 +1,6 @@
 enum ConfigType {
-  profile(0),
-  personal(1);
+  PROFILE(0),
+  PERSONAL(1);
 
   final int number;
 

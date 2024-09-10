@@ -21,6 +21,14 @@ class Connection {
     this.config2,
   });
 
+  User getOtherUser(User currentUser) {
+    if(user1!.id == currentUser.id) {
+      return user2!;
+    }
+
+    return user1!;
+  }
+
   factory Connection.fromJson(Map<String, dynamic> json) => _$ConnectionFromJson(json);
   Map<String, dynamic> toJson() => _$ConnectionToJson(this);
 }

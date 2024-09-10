@@ -2,11 +2,13 @@
 import 'package:contact_app/features/authentication/models/user.dart';
 import 'package:contact_app/features/authentication/views/verify_email.dart';
 import 'package:contact_app/features/connections/views/home_view.dart';
+import 'package:contact_app/utils/constants/api_constants.dart';
 import 'package:contact_app/utils/http/http_client.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 
 import '../../../utils/logging/logger.dart';
@@ -31,7 +33,7 @@ class AuthController {
     } else if(isEmailVerified == null || !isEmailVerified!) {
       Get.offAll(() => VerifyEmailView(authController: this));
     } else {
-      Get.offAll(() => const HomeView());
+      Get.offAll(() => HomeView(authController: this,));
     }
   }
 
@@ -126,7 +128,7 @@ class AuthController {
         return true;
       }
 
-      Get.offAll(() => const HomeView());
+      Get.offAll(() => HomeView(authController: this,));
 
       return true;
     } on Exception catch (_) {
@@ -179,6 +181,22 @@ class AuthController {
     isEmailVerified = false;
 
     Get.offAll(() => LoginView(authController: this,));
+  }
+
+  Future<bool> getEmailVerified() async {
+    try {
+      int userId = currentUser.id!;
+      String jwtToken = (await getJwtToken())!;
+
+      Map<String, dynamic> data = await HttpHelper.get(
+          "users/$userId/isEmailVerified",
+          jwtToken);
+
+      isEmailVerified = data["isEmailVerified"];
+      return isEmailVerified!;
+    } on Exception catch (_) {
+      return false;
+    }
   }
 
   Future<void> storeJwtToken(String token) async {
